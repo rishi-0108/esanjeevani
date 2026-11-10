@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Activity, User, ChevronRight, ChevronLeft, AlertCircle, CheckCircle, Brain, Loader2 } from 'lucide-react';
 import { PatientInfo, QuestionAnswer, DiagnosisReport } from '../types';
-import { followUpQuestions, getQuestionsForSymptoms } from '../data/questions';
+import { getQuestionsForSymptoms } from '../data/questions';
 import { generateReport } from '../utils/diagnosis';
 
 interface SymptomCheckerProps {

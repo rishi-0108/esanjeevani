@@ -46,6 +46,6 @@ export interface DiagnosisReport {
   timestamp: Date;
 }
 
-export type Page = 'home' | 'checker' | 'report' | 'about' | 'contact';
+export type Page = 'home' | 'checker' | 'report' | 'about' | 'contact' | 'login' | 'register' | 'medical-history';
 
 export type CheckerStep = 'basic' | 'symptoms' | 'questions' | 'processing';

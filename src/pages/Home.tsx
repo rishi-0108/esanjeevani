@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Activity, Brain, AlertTriangle, ClipboardList, Stethoscope, FileText,
   ChevronRight, CheckCircle, Star, Phone, Shield, Zap, Clock, Users,
-  ArrowRight, Heart, TrendingUp, Eye, Award, Cpu, Lock
+  ArrowRight, Heart, TrendingUp, Award, Cpu, Lock
 } from 'lucide-react';
 import { Page } from '../types';
 
@@ -196,18 +196,13 @@ export default function Home({ onNavigate }: HomeProps) {
                 </div>
               </div>
 
-              {[
-                { icon: '🔴', label: 'Emergency Alert', sub: 'Detected', top: '-top-4', right: '-right-4' },
-                { icon: '✅', label: 'Report Ready', sub: 'Download PDF', bottom: '-bottom-4', left: '-left-4' },
-              ].map((badge, i) => (
-                <div key={i} className={`absolute ${badge.top || ''} ${badge.bottom || ''} ${badge.right || ''} ${badge.left || ''} bg-white rounded-xl shadow-xl p-3 flex items-center gap-2 animate-bounce`} style={{ animationDelay: `${i * 0.5}s`, animationDuration: '3s' }}>
-                  <span className="text-lg">{badge.icon}</span>
-                  <div>
-                    <p className="text-slate-800 font-semibold text-xs">{badge.label}</p>
-                    <p className="text-slate-400 text-xs">{badge.sub}</p>
-                  </div>
+              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-3 flex items-center gap-2 animate-bounce" style={{ animationDuration: '3s' }}>
+                <span className="text-lg">🔴</span>
+                <div>
+                  <p className="text-slate-800 font-semibold text-xs">Emergency Alert</p>
+                  <p className="text-slate-400 text-xs">Detected</p>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>

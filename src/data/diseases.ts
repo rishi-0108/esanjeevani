@@ -204,7 +204,6 @@ export const diseaseRules: DiseaseRule[] = [
 export function getDiseaseBySymptoms(
   symptoms: string[],
   answers: Record<string, string>,
-  patientAge: number,
   existingConditions: string[]
 ): DiseaseResult[] {
   const scores: { rule: DiseaseRule; score: number; maxScore: number }[] = [];

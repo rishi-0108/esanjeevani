@@ -1,4 +1,4 @@
-import { PatientInfo, QuestionAnswer, DiagnosisReport, DiseaseResult } from '../types';
+import { PatientInfo, QuestionAnswer, DiagnosisReport } from '../types';
 import { getDiseaseBySymptoms } from '../data/diseases';
 
 export function generateReport(
@@ -54,11 +54,9 @@ export function generateReport(
     }
   });
 
-  const age = parseInt(patientInfo.age) || 30;
   const results = getDiseaseBySymptoms(
     [...new Set(allSymptoms)],
     answersMap,
-    age,
     patientInfo.existingConditions
   );
 

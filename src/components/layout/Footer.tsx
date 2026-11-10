@@ -46,6 +46,9 @@ export default function Footer({ onNavigate }: FooterProps) {
                 { label: 'Health Report', page: 'report' as Page },
                 { label: 'About Us', page: 'about' as Page },
                 { label: 'Contact', page: 'contact' as Page },
+                { label: 'Login', page: 'login' as Page },
+                { label: 'Register', page: 'register' as Page },
+                { label: 'Medical History', page: 'medical-history' as Page },
               ].map(link => (
                 <li key={link.page}>
                   <button

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import {
   Activity, AlertTriangle, CheckCircle, Download, Printer,
-  Calendar, User, Stethoscope, Shield, Phone, ChevronRight,
+  User, Stethoscope, Shield, Phone, ChevronRight,
   FileText, Heart, AlertCircle, ArrowRight, TrendingUp, List, Eye
 } from 'lucide-react';
 import { DiagnosisReport, Page } from '../types';
@@ -10,42 +10,57 @@ import { getUrgencyConfig } from '../utils/diagnosis';
 interface ReportProps {
   report: DiagnosisReport;
   onNavigate: (page: Page) => void;
+  saveStatus: 'saving' | 'saved' | 'failed' | null;
+  historical: boolean;
+  onReturnToHistory: () => void;
 }
 
-function UrgencyGauge({ urgency }: { urgency: string }) {
+function UrgencyGauge({ urgency }: { urgency: DiagnosisReport['overallUrgency'] }) {
   const config = getUrgencyConfig(urgency);
   const levels = ['low', 'moderate', 'high', 'emergency'];
   const idx = levels.indexOf(urgency);
+  const needleRotations = [-67.5, -22.5, 22.5, 67.5];
+  const segmentColors = ['#10B981', '#F59E0B', '#F97316', '#EF4444'];
+  const segmentPaths = [
+    'M 7 96 C 7 72.58 16.51 49.63 33.07 33.07',
+    'M 33.07 33.07 C 49.63 16.51 72.58 7 96 7',
+    'M 96 7 C 119.42 7 142.37 16.51 158.93 33.07',
+    'M 158.93 33.07 C 175.49 49.63 185 72.58 185 96',
+  ];
 
   return (
     <div className="relative flex flex-col items-center">
-      <div className="relative w-48 h-24 overflow-hidden mb-3">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full border-[14px] border-slate-100" />
-        {[
-          { color: '#10B981', rotate: -90, opacity: 1 },
-          { color: '#F59E0B', rotate: -45, opacity: 1 },
-          { color: '#F97316', rotate: 0, opacity: 1 },
-          { color: '#EF4444', rotate: 45, opacity: 1 },
-        ].map((seg, i) => (
-          <div
-            key={i}
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full border-[14px] border-transparent"
-            style={{
-              borderTopColor: seg.color,
-              transform: `rotate(${seg.rotate}deg) translateX(-50%)`,
-              transformOrigin: 'center bottom',
-              opacity: i <= idx ? 1 : 0.2,
-            }}
+      <div className="relative w-48 h-24 mb-3">
+        <svg
+          className="absolute inset-0 w-full h-full overflow-visible"
+          viewBox="0 0 192 96"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M 7 96 C 7 72.58 16.51 49.63 33.07 33.07 C 49.63 16.51 72.58 7 96 7 C 119.42 7 142.37 16.51 158.93 33.07 C 175.49 49.63 185 72.58 185 96"
+            stroke="#E2E8F0"
+            strokeWidth="14"
+            strokeLinecap="round"
           />
-        ))}
+          {segmentPaths.slice(0, idx + 1).map((path, i) => (
+            <path
+              key={path}
+              d={path}
+              stroke={segmentColors[i]}
+              strokeWidth="14"
+              strokeLinecap="butt"
+            />
+          ))}
+        </svg>
         <div
           className="absolute bottom-0 left-1/2 w-1 h-20 bg-slate-700 rounded-full origin-bottom transition-all duration-1000"
           style={{
             transformOrigin: 'bottom center',
-            transform: `translateX(-50%) rotate(${-90 + idx * 60}deg)`,
+            transform: `translateX(-50%) rotate(${needleRotations[idx]}deg)`,
           }}
         />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-700 rounded-full" />
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-700 rounded-full" />
       </div>
       <div className={`text-2xl font-black ${config.color}`}>{config.label}</div>
       <div className="text-slate-500 text-xs text-center mt-1 max-w-[160px]">{config.description}</div>
@@ -67,7 +82,7 @@ function ConfidenceBar({ confidence, color }: { confidence: number; color: strin
   );
 }
 
-export default function Report({ report, onNavigate }: ReportProps) {
+export default function Report({ report, onNavigate, saveStatus, historical, onReturnToHistory }: ReportProps) {
   const printRef = useRef<HTMLDivElement>(null);
   const urgencyConfig = getUrgencyConfig(report.overallUrgency);
   const primaryDisease = report.results[0];
@@ -86,6 +101,21 @@ export default function Report({ report, onNavigate }: ReportProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-20 pb-16 print:bg-white print:pt-0">
       <div className="max-w-5xl mx-auto px-4" ref={printRef}>
+        {saveStatus && (
+          <p
+            role={saveStatus === 'failed' ? 'alert' : 'status'}
+            aria-live="polite"
+            className={`mt-8 mb-4 rounded-xl border px-4 py-2.5 text-sm ${
+              saveStatus === 'failed'
+                ? 'border-amber-200 bg-amber-50 text-amber-800'
+                : 'border-teal-200 bg-teal-50 text-teal-800'
+            }`}
+          >
+            {saveStatus === 'saving' && 'Saving report…'}
+            {saveStatus === 'saved' && 'Report saved securely.'}
+            {saveStatus === 'failed' && "Report generated, but it couldn't be saved. Please try again."}
+          </p>
+        )}
         <div className={`${urgencyConfig.bg} ${urgencyConfig.border} border-2 rounded-3xl p-4 mb-6 mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 ${urgencyConfig.badge} rounded-2xl flex items-center justify-center shadow`}>
@@ -383,6 +413,14 @@ export default function Report({ report, onNavigate }: ReportProps) {
             <ArrowRight className="w-5 h-5" />
             New Check
           </button>
+          {historical && (
+            <button
+              onClick={onReturnToHistory}
+              className="flex items-center justify-center gap-2 border border-teal-200 text-teal-700 font-semibold px-6 py-4 rounded-2xl hover:bg-teal-50 transition-all"
+            >
+              Back to Medical History
+            </button>
+          )}
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-center">
